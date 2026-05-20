@@ -12,9 +12,9 @@ export default async function sendEmail({
   // Override 'to' address for Resend onboarding restrictions
   if (hasResend && from === "onboarding@resend.dev") {
     console.log(
-      `Resend onboarding restriction: Overriding recipient from ${to} to ronanreaper@gmail.com`,
+      `Resend onboarding restriction: Overriding recipient from ${to} to ronanantoque0@gmail.com`,
     );
-    to = "ronanreaper@gmail.com";
+    to = "ronanantoque0@gmail.com";
   }
 
   if (hasResend) {
