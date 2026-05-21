@@ -46,8 +46,10 @@ async function authenticate({ email, password, ipAddress }) {
     };
 }
 async function refreshToken({ token, ipAddress }) {
+    console.log(`Attempting to refresh token: ${token} from IP: ${ipAddress}`);
     const refreshToken = await getRefreshToken(token);
     const account = await refreshToken.getAccount();
+    console.log(`Token found for account: ${account.email}`);
     const newRefreshToken = generateRefreshToken(account, ipAddress);
     refreshToken.revoked = new Date();
     refreshToken.revokedByIp = ipAddress;
@@ -62,16 +64,19 @@ async function refreshToken({ token, ipAddress }) {
     };
 }
 async function revokeToken({ token, ipAddress }) {
+    console.log(`Revoking token: ${token} from IP: ${ipAddress}`);
     const refreshToken = await getRefreshToken(token);
     refreshToken.revoked = new Date();
     refreshToken.revokedByIp = ipAddress;
     await refreshToken.save();
 }
 async function register(params, origin) {
+    console.log(`Registering account: ${params.email}`);
     const existingAccount = await db_1.default.Account.findOne({
         where: { email: params.email },
     });
     if (existingAccount) {
+        console.log(`Account already exists: ${params.email}, resending verification email`);
         existingAccount.verificationToken =
             existingAccount.verificationToken || randomTokenString();
         await existingAccount.save();
@@ -86,14 +91,18 @@ async function register(params, origin) {
     await sendVerificationEmail(account, origin);
 }
 async function verifyEmail({ token }) {
+    console.log(`Verifying email with token: ${token}`);
     const account = await db_1.default.Account.findOne({
         where: { verificationToken: token },
     });
-    if (!account)
+    if (!account) {
+        console.error(`Verification failed: Invalid token ${token}`);
         throw "Verification failed";
+    }
     account.verified = new Date();
     account.verificationToken = null;
     await account.save();
+    console.log(`Account verified: ${account.email}`);
 }
 async function forgotPassword({ email }, origin) {
     const account = await db_1.default.Account.findOne({ where: { email } });
@@ -207,7 +216,7 @@ function basicDetails(account) {
 async function sendVerificationEmail(account, origin) {
     let message;
     if (origin) {
-        const verifyUrl = `${origin}/account/verify-email?token=${account.verificationToken}`;
+        const verifyUrl = `${config_1.default.frontendUrl || origin}/account/verify-email?token=${account.verificationToken}`;
         message = `<p>Please click the below link to verify your email address:</p>
                    <p><a href="${verifyUrl}">${verifyUrl}</a></p>`;
     }
@@ -242,7 +251,7 @@ async function sendAlreadyRegisteredEmail(email, origin) {
 async function sendPasswordResetEmail(account, origin) {
     let message;
     if (origin) {
-        const resetUrl = `${origin}/account/reset-password?token=${account.resetToken}`;
+        const resetUrl = `${config_1.default.frontendUrl || origin}/account/reset-password?token=${account.resetToken}`;
         message = `<p>Please click the below link to reset your password, the link will be valid for 1 day:</p>
                    <p><a href="${resetUrl}">${resetUrl}</a></p>`;
     }

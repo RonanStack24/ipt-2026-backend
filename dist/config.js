@@ -20,6 +20,7 @@ const config = {
         },
     },
     port: Number(process.env.PORT) || 4000,
-    corsOrigin: process.env.CORS_ORIGIN || "http://localhost:3000",
+    corsOrigin: process.env.CORS_ORIGIN || "https://angular-21-auth-boilerplate-aw3r.onrender.com",
+    frontendUrl: process.env.FRONTEND_URL || "https://angular-21-auth-boilerplate-aw3r.onrender.com",
 };
 exports.default = config;
