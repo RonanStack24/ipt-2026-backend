@@ -86,10 +86,14 @@ async function register(params: any, origin: any) {
   });
   if (existingAccount) {
     if (existingAccount.isVerified) {
-      console.log(`Account already exists and is verified: ${params.email}, sending already registered email`);
+      console.log(
+        `Account already exists and is verified: ${params.email}, sending already registered email`,
+      );
       return await sendAlreadyRegisteredEmail(existingAccount.email, origin);
     } else {
-      console.log(`Account already exists but is not verified: ${params.email}, resending verification email`);
+      console.log(
+        `Account already exists but is not verified: ${params.email}, resending verification email`,
+      );
       existingAccount.verificationToken =
         existingAccount.verificationToken || randomTokenString();
       await existingAccount.save();
@@ -276,7 +280,7 @@ function basicDetails(account: any) {
 async function sendVerificationEmail(account: any, origin: any) {
   let message;
   if (origin) {
-    const verifyUrl = `${config.frontendUrl || origin}/accounts/verify-email?token=${account.verificationToken}`;
+    const verifyUrl = `${config.frontendUrl || origin}/account/verify-email?token=${account.verificationToken}`;
     message = `<p>Please click the below link to verify your email address:</p>
                    <p><a href="${verifyUrl}">${verifyUrl}</a></p>`;
   } else {
@@ -328,4 +332,3 @@ async function sendPasswordResetEmail(account: any, origin: any) {
                ${message}`,
   });
 }
-
