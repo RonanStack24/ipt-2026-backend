@@ -172,6 +172,14 @@ async function resetPassword({ token, password }: any) {
   account.passwordHash = await hash(password);
   account.passwordReset = new Date();
   account.resetToken = null;
+  account.resetTokenExpires = null;
+
+  // If the account was not verified yet, verify it now since they proved email ownership
+  if (!account.verified) {
+    account.verified = new Date();
+    account.verificationToken = null;
+  }
+
   await account.save();
 }
 
