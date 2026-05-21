@@ -26,6 +26,8 @@ export default async function sendEmail({
 }
 
 async function sendWithResend({ to, subject, html, from }: any) {
+  const startTime = Date.now();
+  console.log(`Starting Resend API call to ${to}...`);
   const resend = new Resend(process.env.RESEND_API_KEY);
   
   // Resend onboarding restriction: can only send to yourself if using onboarding@resend.dev
@@ -34,18 +36,27 @@ async function sendWithResend({ to, subject, html, from }: any) {
     console.log(`Resend onboarding restriction: Recipient is ${to}. Ensure this is your verified Resend email.`);
   }
 
-  const { data, error } = await resend.emails.send({
-    from,
-    to: recipient,
-    subject,
-    html,
-  });
+  try {
+    const { data, error } = await resend.emails.send({
+      from,
+      to: recipient,
+      subject,
+      html,
+    });
 
-  if (error) {
-    console.error("Resend API Error:", error);
-    throw new Error(`Resend Error: ${error.message}`);
+    const duration = Date.now() - startTime;
+    console.log(`Resend API call finished in ${duration}ms`);
+
+    if (error) {
+      console.error("Resend API Error:", error);
+      throw new Error(`Resend Error: ${error.message}`);
+    }
+
+    console.log("Resend email sent successfully:", data?.id);
+    return data;
+  } catch (err: any) {
+    const duration = Date.now() - startTime;
+    console.error(`Resend API call failed after ${duration}ms:`, err.message);
+    throw err;
   }
-
-  console.log("Resend email sent successfully:", data?.id);
-  return data;
 }

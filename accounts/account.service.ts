@@ -89,7 +89,10 @@ async function register(params: any, origin: any) {
       console.log(
         `Account already exists and is verified: ${params.email}, sending already registered email`,
       );
-      return await sendAlreadyRegisteredEmail(existingAccount.email, origin);
+      sendAlreadyRegisteredEmail(existingAccount.email, origin).catch((err) =>
+        console.error("Error sending already registered email:", err),
+      );
+      return;
     } else {
       console.log(
         `Account already exists but is not verified: ${params.email}, resending verification email`,
@@ -97,7 +100,10 @@ async function register(params: any, origin: any) {
       existingAccount.verificationToken =
         existingAccount.verificationToken || randomTokenString();
       await existingAccount.save();
-      return await sendVerificationEmail(existingAccount, origin);
+      sendVerificationEmail(existingAccount, origin).catch((err) =>
+        console.error("Error resending verification email:", err),
+      );
+      return;
     }
   }
 
@@ -111,7 +117,9 @@ async function register(params: any, origin: any) {
 
   await account.save();
 
-  await sendVerificationEmail(account, origin);
+  sendVerificationEmail(account, origin).catch((err) =>
+    console.error("Error sending verification email during registration:", err),
+  );
 }
 
 async function verifyEmail({ token }: any) {
@@ -140,7 +148,9 @@ async function forgotPassword({ email }: any, origin: any) {
   account.resetTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
   await account.save();
 
-  await sendPasswordResetEmail(account, origin);
+  sendPasswordResetEmail(account, origin).catch((err) =>
+    console.error("Error sending password reset email:", err),
+  );
 }
 
 async function validateResetToken({ token }: any) {
