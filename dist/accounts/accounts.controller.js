@@ -115,6 +115,7 @@ function forgotPassword(req, res, next) {
         .catch(next);
 }
 function validateResetTokenSchema(req, res, next) {
+    console.log(`[API] validate-reset-token schema validation. Body:`, req.body, `Query:`, req.query);
     if (!req.body.token && req.query.token)
         req.body.token = req.query.token;
     const schema = joi_1.default.object({
@@ -123,11 +124,20 @@ function validateResetTokenSchema(req, res, next) {
     (0, validate_request_1.default)(req, next, schema);
 }
 function validateResetToken(req, res, next) {
+    var _a, _b;
+    console.log(`[API] validate-reset-token service call with token:`, ((_b = (_a = req.body) === null || _a === void 0 ? void 0 : _a.token) === null || _b === void 0 ? void 0 : _b.substring(0, 10)) + '...');
     account_service_1.default.validateResetToken(req.body)
-        .then(() => res.json({ message: 'Token is valid' }))
-        .catch(next);
+        .then(() => {
+        console.log(`[API] validate-reset-token SUCCESS.`);
+        res.json({ message: 'Token is valid' });
+    })
+        .catch(err => {
+        console.error(`[API] validate-reset-token FAILED:`, err);
+        next(err);
+    });
 }
 function resetPasswordSchema(req, res, next) {
+    console.log(`[API] reset-password schema validation. Body:`, req.body, `Query:`, req.query);
     if (!req.body.token && req.query.token)
         req.body.token = req.query.token;
     const schema = joi_1.default.object({
@@ -138,9 +148,17 @@ function resetPasswordSchema(req, res, next) {
     (0, validate_request_1.default)(req, next, schema);
 }
 function resetPassword(req, res, next) {
+    var _a, _b;
+    console.log(`[API] reset-password service call with token:`, ((_b = (_a = req.body) === null || _a === void 0 ? void 0 : _a.token) === null || _b === void 0 ? void 0 : _b.substring(0, 10)) + '...');
     account_service_1.default.resetPassword(req.body)
-        .then(() => res.json({ message: 'Password reset successful, you can now login' }))
-        .catch(next);
+        .then(() => {
+        console.log(`[API] reset-password SUCCESS.`);
+        res.json({ message: 'Password reset successful, you can now login' });
+    })
+        .catch(err => {
+        console.error(`[API] reset-password FAILED:`, err);
+        next(err);
+    });
 }
 function getAll(req, res, next) {
     account_service_1.default.getAll()

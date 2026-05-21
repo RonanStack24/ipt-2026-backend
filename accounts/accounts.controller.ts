@@ -126,6 +126,7 @@ function forgotPassword(req: any, res: any, next: any) {
 }
 
 function validateResetTokenSchema(req: any, res: any, next: any) {
+    console.log(`[API] validate-reset-token schema validation. Body:`, req.body, `Query:`, req.query);
     if (!req.body.token && req.query.token) req.body.token = req.query.token;
     const schema = Joi.object({
         token: Joi.string().required()
@@ -134,12 +135,20 @@ function validateResetTokenSchema(req: any, res: any, next: any) {
 }
 
 function validateResetToken(req: any, res: any, next: any) {
+    console.log(`[API] validate-reset-token service call with token:`, req.body?.token?.substring(0, 10) + '...');
     accountService.validateResetToken(req.body)
-        .then(() => res.json({ message: 'Token is valid' }))
-        .catch(next);
+        .then(() => {
+            console.log(`[API] validate-reset-token SUCCESS.`);
+            res.json({ message: 'Token is valid' });
+        })
+        .catch(err => {
+            console.error(`[API] validate-reset-token FAILED:`, err);
+            next(err);
+        });
 }
 
 function resetPasswordSchema(req: any, res: any, next: any) {
+    console.log(`[API] reset-password schema validation. Body:`, req.body, `Query:`, req.query);
     if (!req.body.token && req.query.token) req.body.token = req.query.token;
     const schema = Joi.object({
         token: Joi.string().required(),
@@ -150,9 +159,16 @@ function resetPasswordSchema(req: any, res: any, next: any) {
 }
 
 function resetPassword(req: any, res: any, next: any) {
+    console.log(`[API] reset-password service call with token:`, req.body?.token?.substring(0, 10) + '...');
     accountService.resetPassword(req.body)
-        .then(() => res.json({ message: 'Password reset successful, you can now login' }))
-        .catch(next);
+        .then(() => {
+            console.log(`[API] reset-password SUCCESS.`);
+            res.json({ message: 'Password reset successful, you can now login' });
+        })
+        .catch(err => {
+            console.error(`[API] reset-password FAILED:`, err);
+            next(err);
+        });
 }
 
 function getAll(req: any, res: any, next: any) {
