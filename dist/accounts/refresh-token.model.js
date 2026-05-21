@@ -6,7 +6,7 @@ function model(sequelize) {
     const attributes = {
         token: { type: sequelize_1.DataTypes.STRING },
         expires: { type: sequelize_1.DataTypes.DATE },
-        created: { type: sequelize_1.DataTypes.DATE, allowedNull: false, defaultValue: sequelize_1.DataTypes.NOW },
+        created: { type: sequelize_1.DataTypes.DATE, allowNull: false, defaultValue: sequelize_1.DataTypes.NOW },
         createdByIp: { type: sequelize_1.DataTypes.STRING },
         revoked: { type: sequelize_1.DataTypes.DATE },
         revokedByIp: { type: sequelize_1.DataTypes.STRING },
@@ -20,6 +20,6 @@ function model(sequelize) {
             get() { return !this.revoked && !this.isExpired; }
         }
     };
-    const options = { timestamp: false };
+    const options = { timestamps: false };
     return sequelize.define('refreshToken', attributes, options);
 }

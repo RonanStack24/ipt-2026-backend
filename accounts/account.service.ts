@@ -49,8 +49,10 @@ async function authenticate({ email, password, ipAddress }: any) {
 }
 
 async function refreshToken({ token, ipAddress }: any) {
+  console.log(`Attempting to refresh token: ${token} from IP: ${ipAddress}`);
   const refreshToken = await getRefreshToken(token);
   const account = await refreshToken.getAccount();
+  console.log(`Token found for account: ${account.email}`);
 
   const newRefreshToken = generateRefreshToken(account, ipAddress);
   refreshToken.revoked = new Date();
@@ -69,6 +71,7 @@ async function refreshToken({ token, ipAddress }: any) {
 }
 
 async function revokeToken({ token, ipAddress }: any) {
+  console.log(`Revoking token: ${token} from IP: ${ipAddress}`);
   const refreshToken = await getRefreshToken(token);
 
   refreshToken.revoked = new Date();
@@ -77,10 +80,12 @@ async function revokeToken({ token, ipAddress }: any) {
 }
 
 async function register(params: any, origin: any) {
+  console.log(`Registering account: ${params.email}`);
   const existingAccount = await db.Account.findOne({
     where: { email: params.email },
   });
   if (existingAccount) {
+    console.log(`Account already exists: ${params.email}, resending verification email`);
     existingAccount.verificationToken =
       existingAccount.verificationToken || randomTokenString();
     await existingAccount.save();
@@ -101,15 +106,20 @@ async function register(params: any, origin: any) {
 }
 
 async function verifyEmail({ token }: any) {
+  console.log(`Verifying email with token: ${token}`);
   const account = await db.Account.findOne({
     where: { verificationToken: token },
   });
 
-  if (!account) throw "Verification failed";
+  if (!account) {
+    console.error(`Verification failed: Invalid token ${token}`);
+    throw "Verification failed";
+  }
 
   account.verified = new Date();
   account.verificationToken = null;
   await account.save();
+  console.log(`Account verified: ${account.email}`);
 }
 
 async function forgotPassword({ email }: any, origin: any) {
