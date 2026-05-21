@@ -19,11 +19,20 @@ app.use(cookieParser());
 // allow cors requests from any origin and with credentials
 app.use(cors({ 
     origin: (origin, callback) => {
-        const allowedOrigins = [config.corsOrigin];
-        if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
+        const cleanCorsOrigin = (config.corsOrigin || "").replace(/\/$/, "");
+        const allowedOrigins = [
+            cleanCorsOrigin,
+            "https://ipt-2026-frontend-yay2.onrender.com",
+            "https://angular-21-auth-boilerplate-aw3r.onrender.com"
+        ];
+        
+        const cleanOrigin = origin ? origin.replace(/\/$/, "") : "";
+        
+        if (!origin || allowedOrigins.includes(cleanOrigin) || process.env.NODE_ENV !== 'production') {
             callback(null, true);
         } else {
-            callback(new Error('Not allowed by CORS'));
+            console.warn(`CORS Warning: Origin ${origin} not explicitly allowed.`);
+            callback(null, false); // Don't throw to prevent hanging the Express server
         }
     }, 
     credentials: true 
