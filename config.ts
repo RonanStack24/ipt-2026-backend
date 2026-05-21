@@ -7,7 +7,7 @@ const config = {
     database: process.env.DB_NAME || "node_mysql_api",
   },
   secret: process.env.JWT_SECRET || "THIS_IS_A_SECRET_KEY",
-  emailFrom: process.env.EMAIL_FROM || "ronanreaper@gmail.com",
+  emailFrom: process.env.EMAIL_FROM || "ronanantoque0@gmail.com",
   smtpOptions: {
     host: process.env.SMTP_HOST || "smtp.ethereal.email",
     port: Number(process.env.SMTP_PORT) || 465,

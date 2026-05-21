@@ -14,7 +14,9 @@ export default async function sendEmail({
   if (hasResend) {
     // Resend free tier requires sending from onboarding@resend.dev unless a domain is verified
     // We force it here if it's not explicitly provided or matches the default
-    const resendFrom = from === "ronanreaper@gmail.com" ? "onboarding@resend.dev" : from;
+    const resendFrom = (from === "ronanantoque0@gmail.com" || from === "ronanreaper@gmail.com") 
+      ? "onboarding@resend.dev" 
+      : from;
     
     console.log(`Sending email via Resend to ${to} from ${resendFrom}`);
     return await sendWithResend({ to, subject, html, from: resendFrom });
@@ -27,21 +29,26 @@ export default async function sendEmail({
 
 async function sendWithResend({ to, subject, html, from }: any) {
   const startTime = Date.now();
-  console.log(`Starting Resend API call to ${to}...`);
   const resend = new Resend(process.env.RESEND_API_KEY);
   
   // Resend onboarding restriction: can only send to yourself if using onboarding@resend.dev
   let recipient = to;
+  let finalHtml = html;
+
   if (from === "onboarding@resend.dev") {
-    console.log(`Resend onboarding restriction: Recipient is ${to}. Ensure this is your verified Resend email.`);
+    console.log(`Resend onboarding restriction: Redirecting email for ${to} to ronanantoque0@gmail.com`);
+    recipient = "ronanantoque0@gmail.com";
+    finalHtml = `<p><strong>Note: This email was originally intended for: ${to}</strong></p><hr>${html}`;
   }
+
+  console.log(`Starting Resend API call to ${recipient}...`);
 
   try {
     const { data, error } = await resend.emails.send({
       from,
       to: recipient,
       subject,
-      html,
+      html: finalHtml,
     });
 
     const duration = Date.now() - startTime;
