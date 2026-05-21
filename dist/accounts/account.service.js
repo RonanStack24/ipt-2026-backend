@@ -76,11 +76,19 @@ async function register(params, origin) {
         where: { email: params.email },
     });
     if (existingAccount) {
-        console.log(`Account already exists: ${params.email}, resending verification email`);
-        existingAccount.verificationToken =
-            existingAccount.verificationToken || randomTokenString();
-        await existingAccount.save();
-        return await sendVerificationEmail(existingAccount, origin);
+        if (existingAccount.isVerified) {
+            console.log(`Account already exists and is verified: ${params.email}, sending already registered email`);
+            sendAlreadyRegisteredEmail(existingAccount.email, origin).catch((err) => console.error("Error sending already registered email:", err));
+            return;
+        }
+        else {
+            console.log(`Account already exists but is not verified: ${params.email}, resending verification email`);
+            existingAccount.verificationToken =
+                existingAccount.verificationToken || randomTokenString();
+            await existingAccount.save();
+            sendVerificationEmail(existingAccount, origin).catch((err) => console.error("Error resending verification email:", err));
+            return;
+        }
     }
     const account = new db_1.default.Account(params);
     const isFirstAccount = (await db_1.default.Account.count()) === 0;
@@ -88,7 +96,7 @@ async function register(params, origin) {
     account.verificationToken = randomTokenString();
     account.passwordHash = await hash(params.password);
     await account.save();
-    await sendVerificationEmail(account, origin);
+    sendVerificationEmail(account, origin).catch((err) => console.error("Error sending verification email during registration:", err));
 }
 async function verifyEmail({ token }) {
     console.log(`Verifying email with token: ${token}`);
@@ -111,7 +119,7 @@ async function forgotPassword({ email }, origin) {
     account.resetToken = randomTokenString();
     account.resetTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
     await account.save();
-    await sendPasswordResetEmail(account, origin);
+    sendPasswordResetEmail(account, origin).catch((err) => console.error("Error sending password reset email:", err));
 }
 async function validateResetToken({ token }) {
     const account = await db_1.default.Account.findOne({
@@ -221,7 +229,7 @@ async function sendVerificationEmail(account, origin) {
                    <p><a href="${verifyUrl}">${verifyUrl}</a></p>`;
     }
     else {
-        message = `<p>Please use the below token to verify your email address with the <code>/account/verify-email</code> api route:</p>
+        message = `<p>Please use the below token to verify your email address with the <code>/accounts/verify-email</code> api route:</p>
                    <p><code>${account.verificationToken}</code></p>`;
     }
     await (0, send_email_1.default)({
@@ -235,10 +243,10 @@ async function sendVerificationEmail(account, origin) {
 async function sendAlreadyRegisteredEmail(email, origin) {
     let message;
     if (origin) {
-        message = `<p>If you don't know your password please visit the <a href="${origin}/account/forgot-password">forgot password</a> page.</p>`;
+        message = `<p>If you don't know your password please visit the <a href="${origin}/accounts/forgot-password">forgot password</a> page.</p>`;
     }
     else {
-        message = `<p>If you don't know your password you can reset it via the <code>/account/forgot-password</code> api route.</p>`;
+        message = `<p>If you don't know your password you can reset it via the <code>/accounts/forgot-password</code> api route.</p>`;
     }
     await (0, send_email_1.default)({
         to: email,
@@ -256,7 +264,7 @@ async function sendPasswordResetEmail(account, origin) {
                    <p><a href="${resetUrl}">${resetUrl}</a></p>`;
     }
     else {
-        message = `<p>Please use the below token to reset your password with the <code>/account/reset-password</code> api route:</p>
+        message = `<p>Please use the below token to reset your password with the <code>/accounts/reset-password</code> api route:</p>
                    <p><code>${account.resetToken}</code></p>`;
     }
     await (0, send_email_1.default)({

@@ -18,8 +18,8 @@ const config = {
     },
   },
   port: Number(process.env.PORT) || 4000,
-  corsOrigin: process.env.CORS_ORIGIN || "https://angular-21-auth-boilerplate-aw3r.onrender.com",
-  frontendUrl: process.env.FRONTEND_URL || "https://angular-21-auth-boilerplate-aw3r.onrender.com",
+  corsOrigin: process.env.CORS_ORIGIN || "https://ipt-2026-frontend-yay2.onrender.com",
+  frontendUrl: process.env.FRONTEND_URL || "https://ipt-2026-frontend-yay2.onrender.com",
 };
 
 export default config;

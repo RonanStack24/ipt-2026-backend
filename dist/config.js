@@ -9,7 +9,7 @@ const config = {
         database: process.env.DB_NAME || "node_mysql_api",
     },
     secret: process.env.JWT_SECRET || "THIS_IS_A_SECRET_KEY",
-    emailFrom: process.env.EMAIL_FROM || "ronanreaper@gmail.com",
+    emailFrom: process.env.EMAIL_FROM || "ronanantoque0@gmail.com",
     smtpOptions: {
         host: process.env.SMTP_HOST || "smtp.ethereal.email",
         port: Number(process.env.SMTP_PORT) || 465,
@@ -20,7 +20,7 @@ const config = {
         },
     },
     port: Number(process.env.PORT) || 4000,
-    corsOrigin: process.env.CORS_ORIGIN || "https://angular-21-auth-boilerplate-aw3r.onrender.com",
-    frontendUrl: process.env.FRONTEND_URL || "https://angular-21-auth-boilerplate-aw3r.onrender.com",
+    corsOrigin: process.env.CORS_ORIGIN || "https://ipt-2026-frontend-yay2.onrender.com",
+    frontendUrl: process.env.FRONTEND_URL || "https://ipt-2026-frontend-yay2.onrender.com",
 };
 exports.default = config;
