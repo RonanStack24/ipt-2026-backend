@@ -22,8 +22,7 @@ app.use(cors({
         const cleanCorsOrigin = (config.corsOrigin || "").replace(/\/$/, "");
         const allowedOrigins = [
             cleanCorsOrigin,
-            "https://ipt-2026-frontend-yay2.onrender.com",
-            "https://angular-21-auth-boilerplate-aw3r.onrender.com"
+            "https://ipt-2026-frontend-yay2.onrender.com"
         ];
         
         const cleanOrigin = origin ? origin.replace(/\/$/, "") : "";
