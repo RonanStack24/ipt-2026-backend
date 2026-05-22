@@ -18,6 +18,9 @@ export default function model(sequelize: any) {
             get() { return !this.revoked && !this.isExpired; }
         }
     };
-    const options = { timestamps: false };
+    const options = { 
+        timestamps: false,
+        tableName: 'app_refresh_tokens' 
+    };
     return sequelize.define('refreshToken', attributes, options);
 }
